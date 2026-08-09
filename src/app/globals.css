@@ -1,130 +1,351 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   IHS DECA — PURPLE × BLACK THEME
+   Self-contained token set (no external shadcn import required).
+   Exposes CSS vars AND Tailwind utilities (bg-purple, text-magenta,
+   from-violet-glow, etc.) plus custom neon/glass/aurora utilities.
+   ============================================================ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
+  --font-heading: var(--font-heading);
+
+  /* --- Purple × Black brand palette --- */
+  --color-ink: #08060f;          /* near-black violet base   */
+  --color-purple-deep: #2e1065;  /* deep panel violet        */
+  --color-purple: #7c3aed;       /* primary purple           */
+  --color-purple-bright: #a855f7;/* vivid highlight          */
+  --color-violet-glow: #c084fc;  /* soft glow / text accent  */
+  --color-magenta: #d946ef;      /* electric fuchsia accent  */
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ------------------------------------------------------------
+   Token values. Light kept minimal for shadcn components;
+   the app runs dark-mode-first via `dark` on <html>.
+   ------------------------------------------------------------ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #ffffff;
+  --foreground: #0b0713;
+  --card: #ffffff;
+  --card-foreground: #0b0713;
+  --popover: #ffffff;
+  --popover-foreground: #0b0713;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #f3effc;
+  --secondary-foreground: #2e1065;
+  --muted: #f4f2fa;
+  --muted-foreground: #6b6480;
+  --accent: #f0e9ff;
+  --accent-foreground: #2e1065;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: #e7e1f5;
+  --input: #e7e1f5;
+  --ring: #a855f7;
+  --radius: 0.85rem;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: #08060f;
+  --foreground: oklch(0.97 0.012 300);
+  --card: #100a1f;
+  --card-foreground: oklch(0.97 0.012 300);
+  --popover: #120b24;
+  --popover-foreground: oklch(0.97 0.012 300);
+  --primary: #8b5cf6;
+  --primary-foreground: #0b0713;
+  --secondary: #180f2e;
+  --secondary-foreground: oklch(0.97 0.012 300);
+  --muted: #150d28;
+  --muted-foreground: oklch(0.72 0.03 300);
+  --accent: #2e1065;
+  --accent-foreground: #e9d5ff;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --input: oklch(1 0 0 / 14%);
+  --ring: #a855f7;
 }
 
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+@keyframes aurora-drift-1 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(6rem, 4rem, 0) scale(1.25); }
+}
+@keyframes aurora-drift-2 {
+  0%   { transform: translate3d(0, 0, 0) scale(1.1); }
+  100% { transform: translate3d(-5rem, 3rem, 0) scale(0.9); }
+}
+@keyframes aurora-drift-3 {
+  0%   { transform: translate3d(-50%, 0, 0) scale(1); opacity: 0.5; }
+  100% { transform: translate3d(-50%, -3rem, 0) scale(1.3); opacity: 0.8; }
+}
+@keyframes gradient-pan {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 18px -2px var(--color-purple-bright), 0 0 40px -10px var(--color-magenta); }
+  50%      { box-shadow: 0 0 28px 2px var(--color-magenta), 0 0 60px -6px var(--color-purple-bright); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
+    border-color: var(--border);
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    /* Static violet vignette under the animated aurora layers. */
+    background-image:
+      radial-gradient(60% 50% at 10% -8%, color-mix(in oklch, var(--color-purple) 30%, transparent), transparent 70%),
+      radial-gradient(55% 45% at 100% 0%, color-mix(in oklch, var(--color-magenta) 22%, transparent), transparent 65%),
+      radial-gradient(90% 60% at 50% 120%, color-mix(in oklch, var(--color-purple-deep) 60%, transparent), transparent 75%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading), var(--font-sans), sans-serif;
+    letter-spacing: -0.015em;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--color-purple-bright) 45%, transparent);
+    color: #fff;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background: linear-gradient(var(--color-purple), var(--color-magenta)) padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(var(--color-purple-bright), var(--color-magenta)) padding-box;
+  }
+}
+
+/* ============================================================
+   COMPONENT LAYER — decorative pieces using pseudo-elements
+   ============================================================ */
+@layer components {
+  /* Full-screen animated aurora background. Mount once in layout. */
+  .aurora {
+    position: fixed;
+    inset: 0;
+    z-index: -20;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .aurora__blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(90px);
+    will-change: transform;
+  }
+  .aurora__blob--1 {
+    width: 46rem; height: 46rem;
+    top: -14rem; left: -12rem;
+    background: radial-gradient(circle at center, var(--color-purple) 0%, transparent 62%);
+    opacity: 0.6;
+    animation: aurora-drift-1 20s ease-in-out infinite alternate;
+  }
+  .aurora__blob--2 {
+    width: 40rem; height: 40rem;
+    top: -8rem; right: -10rem;
+    background: radial-gradient(circle at center, var(--color-magenta) 0%, transparent 60%);
+    opacity: 0.5;
+    animation: aurora-drift-2 24s ease-in-out infinite alternate;
+  }
+  .aurora__blob--3 {
+    width: 52rem; height: 34rem;
+    bottom: -18rem; left: 50%;
+    background: radial-gradient(circle at center, var(--color-purple-bright) 0%, transparent 60%);
+    opacity: 0.45;
+    animation: aurora-drift-3 26s ease-in-out infinite alternate;
+  }
+
+  /* Faint perspective grid that fades toward the middle. */
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -19;
+    pointer-events: none;
+    background-image:
+      linear-gradient(color-mix(in oklch, var(--color-purple-bright) 12%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklch, var(--color-purple-bright) 12%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 10%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 10%, transparent 75%);
+  }
+
+  /* Gradient-outlined card that lights up on hover. */
+  .card-glow {
+    position: relative;
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(180deg,
+        color-mix(in oklch, var(--card) 82%, transparent),
+        color-mix(in oklch, var(--color-purple-deep) 22%, var(--card)));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  .card-glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(140deg,
+      var(--color-purple-bright),
+      transparent 42%,
+      transparent 60%,
+      var(--color-magenta));
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.55;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
+  .card-glow:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 50px -20px color-mix(in oklch, var(--color-magenta) 70%, transparent);
+  }
+  .card-glow:hover::before { opacity: 1; }
+
+  /* Sweeping shine on hover (buttons, badges). */
+  .shimmer { position: relative; overflow: hidden; }
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-130%) skewX(-18deg);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    transition: transform 0.7s ease;
+    pointer-events: none;
+  }
+  .shimmer:hover::after { transform: translateX(130%) skewX(-18deg); }
+}
+
+/* ============================================================
+   UTILITIES — flat, composable helpers
+   ============================================================ */
+
+/* Frosted glass surface (navbar, panels). */
+@utility glass {
+  background-color: color-mix(in oklch, var(--card) 55%, transparent);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid color-mix(in oklch, var(--color-purple-bright) 16%, transparent);
+}
+
+/* Neon glow rings. */
+@utility glow-purple {
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-purple-bright) 45%, transparent),
+    0 10px 34px -10px color-mix(in oklch, var(--color-purple-bright) 70%, transparent);
+}
+@utility glow-magenta {
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-magenta) 45%, transparent),
+    0 10px 34px -10px color-mix(in oklch, var(--color-magenta) 75%, transparent);
+}
+
+/* Animated brand-mark glow (used on the logo badge). */
+@utility pulse-glow {
+  animation: pulse-glow 3.6s ease-in-out infinite;
+}
+@utility float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+/* Text glow accents. */
+@utility text-glow-purple {
+  text-shadow: 0 0 22px color-mix(in oklch, var(--color-purple-bright) 80%, transparent);
+}
+
+/* Animated gradient text (violet -> fuchsia -> purple, panning). */
+@utility text-gradient-brand {
+  background-image: linear-gradient(100deg,
+    var(--color-violet-glow),
+    var(--color-magenta),
+    var(--color-purple-bright),
+    var(--color-violet-glow));
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradient-pan 6s linear infinite;
+}
+
+/* Glowing hairline divider. */
+@utility brand-hairline {
+  height: 1px;
+  background-image: linear-gradient(90deg,
+    transparent,
+    color-mix(in oklch, var(--color-purple-bright) 65%, transparent),
+    color-mix(in oklch, var(--color-magenta) 65%, transparent),
+    transparent);
+}
+
+/* ============================================================
+   MOTION SAFETY
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  .aurora__blob,
+  .text-gradient-brand,
+  .pulse-glow,
+  .float-slow {
+    animation: none !important;
+    transition: none !important;
   }
 }
