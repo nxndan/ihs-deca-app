@@ -5,9 +5,8 @@
 
 /* ============================================================
    IHS DECA — PURPLE × BLACK THEME
-   Self-contained token set (no external shadcn import required).
-   Exposes CSS vars AND Tailwind utilities (bg-purple, text-magenta,
-   from-violet-glow, etc.) plus custom neon/glass/aurora utilities.
+   Lighting lives on the UI (neon borders, glass edges, hover
+   lines) rather than in ambient background spotlights.
    ============================================================ */
 @theme inline {
   --color-background: var(--background);
@@ -34,12 +33,12 @@
   --font-heading: var(--font-heading);
 
   /* --- Purple × Black brand palette --- */
-  --color-ink: #08060f;          /* near-black violet base   */
-  --color-purple-deep: #2e1065;  /* deep panel violet        */
-  --color-purple: #7c3aed;       /* primary purple           */
-  --color-purple-bright: #a855f7;/* vivid highlight          */
-  --color-violet-glow: #c084fc;  /* soft glow / text accent  */
-  --color-magenta: #d946ef;      /* electric fuchsia accent  */
+  --color-ink: #08060f;
+  --color-purple-deep: #2e1065;
+  --color-purple: #7c3aed;
+  --color-purple-bright: #a855f7;
+  --color-violet-glow: #c084fc;
+  --color-magenta: #d946ef;
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -49,10 +48,6 @@
   --radius-3xl: calc(var(--radius) * 2.2);
 }
 
-/* ------------------------------------------------------------
-   Token values. Light kept minimal for shadcn components;
-   the app runs dark-mode-first via `dark` on <html>.
-   ------------------------------------------------------------ */
 :root {
   --background: #ffffff;
   --foreground: #0b0713;
@@ -99,18 +94,6 @@
 /* ============================================================
    KEYFRAMES
    ============================================================ */
-@keyframes aurora-drift-1 {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  100% { transform: translate3d(6rem, 4rem, 0) scale(1.25); }
-}
-@keyframes aurora-drift-2 {
-  0%   { transform: translate3d(0, 0, 0) scale(1.1); }
-  100% { transform: translate3d(-5rem, 3rem, 0) scale(0.9); }
-}
-@keyframes aurora-drift-3 {
-  0%   { transform: translate3d(-50%, 0, 0) scale(1); opacity: 0.5; }
-  100% { transform: translate3d(-50%, -3rem, 0) scale(1.3); opacity: 0.8; }
-}
 @keyframes gradient-pan {
   0%   { background-position: 0% 50%; }
   100% { background-position: 200% 50%; }
@@ -123,9 +106,25 @@
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-6px); }
 }
+@keyframes loader-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+@keyframes edge-sweep {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes modal-in {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
 
 /* ============================================================
-   BASE
+   BASE — flat background, no ambient spotlights
    ============================================================ */
 @layer base {
   * {
@@ -140,14 +139,6 @@
     color: var(--foreground);
     min-height: 100dvh;
     -webkit-font-smoothing: antialiased;
-    position: relative;
-    /* Static violet vignette under the animated aurora layers. */
-    background-image:
-      radial-gradient(60% 50% at 10% -8%, color-mix(in oklch, var(--color-purple) 30%, transparent), transparent 70%),
-      radial-gradient(55% 45% at 100% 0%, color-mix(in oklch, var(--color-magenta) 22%, transparent), transparent 65%),
-      radial-gradient(90% 60% at 50% 120%, color-mix(in oklch, var(--color-purple-deep) 60%, transparent), transparent 75%);
-    background-attachment: fixed;
-    background-repeat: no-repeat;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-heading), var(--font-sans), sans-serif;
@@ -170,94 +161,38 @@
 }
 
 /* ============================================================
-   COMPONENT LAYER — decorative pieces using pseudo-elements
+   COMPONENT LAYER
    ============================================================ */
 @layer components {
-  /* Full-screen animated aurora background. Mount once in layout. */
-  .aurora {
-    position: fixed;
-    inset: 0;
-    z-index: -20;
-    overflow: hidden;
-    pointer-events: none;
-  }
-  .aurora__blob {
-    position: absolute;
-    border-radius: 9999px;
-    filter: blur(90px);
-    will-change: transform;
-  }
-  .aurora__blob--1 {
-    width: 46rem; height: 46rem;
-    top: -14rem; left: -12rem;
-    background: radial-gradient(circle at center, var(--color-purple) 0%, transparent 62%);
-    opacity: 0.6;
-    animation: aurora-drift-1 20s ease-in-out infinite alternate;
-  }
-  .aurora__blob--2 {
-    width: 40rem; height: 40rem;
-    top: -8rem; right: -10rem;
-    background: radial-gradient(circle at center, var(--color-magenta) 0%, transparent 60%);
-    opacity: 0.5;
-    animation: aurora-drift-2 24s ease-in-out infinite alternate;
-  }
-  .aurora__blob--3 {
-    width: 52rem; height: 34rem;
-    bottom: -18rem; left: 50%;
-    background: radial-gradient(circle at center, var(--color-purple-bright) 0%, transparent 60%);
-    opacity: 0.45;
-    animation: aurora-drift-3 26s ease-in-out infinite alternate;
-  }
-
-  /* Faint perspective grid that fades toward the middle. */
-  .grid-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: -19;
-    pointer-events: none;
-    background-image:
-      linear-gradient(color-mix(in oklch, var(--color-purple-bright) 12%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in oklch, var(--color-purple-bright) 12%, transparent) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 10%, transparent 75%);
-    -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 10%, transparent 75%);
-  }
-
-  /* Gradient-outlined card that lights up on hover. */
+  /* Neon-bordered glass card with an Apple-style top edge highlight
+     and a purple hairline that sweeps in on hover. */
   .card-glow {
     position: relative;
     border-radius: var(--radius-xl);
-    background:
-      linear-gradient(180deg,
-        color-mix(in oklch, var(--card) 82%, transparent),
-        color-mix(in oklch, var(--color-purple-deep) 22%, var(--card)));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012));
+    border: 1px solid color-mix(in oklch, var(--color-purple-bright) 18%, transparent);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
   .card-glow::before {
     content: "";
     position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(140deg,
-      var(--color-purple-bright),
-      transparent 42%,
-      transparent 60%,
-      var(--color-magenta));
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0.55;
+    left: 1.25rem;
+    right: 1.25rem;
+    top: -1px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-purple-bright), var(--color-magenta), transparent);
+    opacity: 0;
     transition: opacity 0.35s ease;
     pointer-events: none;
   }
   .card-glow:hover {
     transform: translateY(-4px);
-    box-shadow: 0 18px 50px -20px color-mix(in oklch, var(--color-magenta) 70%, transparent);
+    border-color: color-mix(in oklch, var(--color-purple-bright) 55%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+      0 0 0 1px color-mix(in oklch, var(--color-purple) 35%, transparent),
+      0 18px 45px -22px color-mix(in oklch, var(--color-magenta) 65%, transparent);
   }
   .card-glow:hover::before { opacity: 1; }
 
@@ -273,18 +208,70 @@
     pointer-events: none;
   }
   .shimmer:hover::after { transform: translateX(130%) skewX(-18deg); }
+
+  /* Page-loader indeterminate bar. */
+  .loader-bar {
+    animation: loader-slide 1.1s ease-in-out infinite;
+  }
+
+  /* Typewriter caret. */
+  .typed-caret {
+    display: inline-block;
+    margin-left: 0.06em;
+    color: var(--color-purple-bright);
+    text-shadow: 0 0 16px color-mix(in oklch, var(--color-purple-bright) 75%, transparent);
+    font-weight: 400;
+  }
+  .typed-caret--blink { animation: caret-blink 1s step-end infinite; }
+
+  /* Glass tilt card (announcements): border + top edge highlight; the tilt
+     transform and glare are driven by JS. No purple background glow. */
+  .tilt-card {
+    position: relative;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+    border: 1px solid color-mix(in oklch, var(--color-purple-bright) 20%, transparent);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    will-change: transform;
+    transition: transform 0.15s ease-out, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tilt-card:hover {
+    border-color: color-mix(in oklch, var(--color-purple-bright) 48%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
+      0 24px 45px -26px rgba(0, 0, 0, 0.85);
+  }
+  .tilt-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Modal enter animation. */
+  .animate-modal-in { animation: modal-in 0.25s ease-out both; }
 }
 
 /* ============================================================
-   UTILITIES — flat, composable helpers
+   UTILITIES
    ============================================================ */
 
-/* Frosted glass surface (navbar, panels). */
+/* Frosted glass surface with a crisp top edge (navbar, footer). */
 @utility glass {
   background-color: color-mix(in oklch, var(--card) 55%, transparent);
   backdrop-filter: blur(16px) saturate(150%);
   -webkit-backdrop-filter: blur(16px) saturate(150%);
   border: 1px solid color-mix(in oklch, var(--color-purple-bright) 16%, transparent);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Glass panel: hairline border + inset top highlight for large sections. */
+@utility glass-edge {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.006));
+  border: 1px solid color-mix(in oklch, var(--color-purple-bright) 16%, transparent);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.09);
 }
 
 /* Neon glow rings. */
@@ -299,15 +286,9 @@
     0 10px 34px -10px color-mix(in oklch, var(--color-magenta) 75%, transparent);
 }
 
-/* Animated brand-mark glow (used on the logo badge). */
-@utility pulse-glow {
-  animation: pulse-glow 3.6s ease-in-out infinite;
-}
-@utility float-slow {
-  animation: float-slow 5s ease-in-out infinite;
-}
+@utility pulse-glow { animation: pulse-glow 3.6s ease-in-out infinite; }
+@utility float-slow { animation: float-slow 5s ease-in-out infinite; }
 
-/* Text glow accents. */
 @utility text-glow-purple {
   text-shadow: 0 0 22px color-mix(in oklch, var(--color-purple-bright) 80%, transparent);
 }
@@ -326,7 +307,7 @@
   animation: gradient-pan 6s linear infinite;
 }
 
-/* Glowing hairline divider. */
+/* Glowing hairline divider — static neon line. */
 @utility brand-hairline {
   height: 1px;
   background-image: linear-gradient(90deg,
@@ -336,15 +317,29 @@
     transparent);
 }
 
+/* Animated neon hairline — the same line, gently sweeping. */
+@utility brand-hairline-anim {
+  height: 1px;
+  background-image: linear-gradient(90deg,
+    transparent,
+    color-mix(in oklch, var(--color-purple-bright) 70%, transparent),
+    color-mix(in oklch, var(--color-magenta) 70%, transparent),
+    transparent);
+  background-size: 200% 100%;
+  animation: edge-sweep 6s linear infinite;
+}
+
 /* ============================================================
    MOTION SAFETY
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   *,
-  .aurora__blob,
   .text-gradient-brand,
   .pulse-glow,
-  .float-slow {
+  .float-slow,
+  .loader-bar,
+  .typed-caret--blink,
+  .brand-hairline-anim {
     animation: none !important;
     transition: none !important;
   }

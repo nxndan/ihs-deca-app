@@ -37,14 +37,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`dark ${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        {/* Animated purple aurora + grid — fixed behind all content. */}
-        <div className="aurora" aria-hidden="true">
-          <div className="aurora__blob aurora__blob--1" />
-          <div className="aurora__blob aurora__blob--2" />
-          <div className="aurora__blob aurora__blob--3" />
-        </div>
-        <div className="grid-overlay" aria-hidden="true" />
-
         {/* HUGE faded combined logo — the "mega evolution" ghost behind the site. */}
         <div
           aria-hidden="true"
