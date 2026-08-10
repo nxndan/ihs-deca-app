@@ -2,7 +2,7 @@
   "reset": false,
   "capacity": 2,
   "closedDays": {
-    "Monday": true,
+    "Monday": false,
     "Tuesday": false,
     "Wednesday": false,
     "Thursday": false,
