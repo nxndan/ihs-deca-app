@@ -1,0 +1,11 @@
+{
+  "reset": false,
+  "capacity": 2,
+  "closedDays": {
+    "Monday": true,
+    "Tuesday": false,
+    "Wednesday": false,
+    "Thursday": false,
+    "Friday": false
+  }
+}
