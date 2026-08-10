@@ -1,6 +1,7 @@
 import { kv } from "@vercel/kv";
 import { revalidatePath } from "next/cache";
-import config from '@/data/store-config.json';
+import config from "@/data/store-config.json";
+
 // Always fetch the latest signup state on every request.
 export const dynamic = "force-dynamic";
 
@@ -8,26 +9,45 @@ export const dynamic = "force-dynamic";
 // Types & config
 // ------------------------------------------------------------------
 type Signup = { name: string; email: string };
-type SignupData = Record<string, Signup[]>;
+type ShiftId = "morning" | "afternoon";
+type DayData = Record<ShiftId, Signup[]>;
+// Stored value may be a DayData object, or (legacy) a flat array.
+type SignupData = Record<string, DayData | Signup[]>;
 
 const KV_KEY = "store_signups";
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-] as const;
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] as const;
 
-const CAPACITY: number =
-  (config as { capacity?: number }).capacity ?? 2;
-const closedDays = config.closedDays as Record<string, boolean>;
+// Per-shift capacity (2 morning + 2 afternoon = 4 per day).
+const CAPACITY: number = (config as { capacity?: number }).capacity ?? 2;
+const SHIFTS = config.shifts as { id: ShiftId; label: string; time: string }[];
+// Closures are per shift now: closed[day][shift] === true disables just that slot.
+const closed = config.closed as Record<string, Partial<Record<ShiftId, boolean>>>;
+
+function shiftClosed(day: string, shift: ShiftId): boolean {
+  return Boolean(closed[day]?.[shift]);
+}
+
+// Bento spans — three medium tiles on top, two wide tiles below.
+const SPAN: Record<string, string> = {
+  Monday: "lg:col-span-2",
+  Tuesday: "lg:col-span-2",
+  Wednesday: "lg:col-span-2",
+  Thursday: "lg:col-span-3",
+  Friday: "lg:col-span-3",
+};
+
+// Normalize whatever is stored for a day into { morning, afternoon }.
+function dayData(raw: unknown): DayData {
+  if (Array.isArray(raw)) return { morning: raw as Signup[], afternoon: [] };
+  const o = (raw ?? {}) as Partial<DayData>;
+  return { morning: o.morning ?? [], afternoon: o.afternoon ?? [] };
+}
 
 // Read helper — tolerant of a not-yet-provisioned KV store so the page
 // still renders in local dev before Vercel KV is connected.
 async function getSignups(): Promise<SignupData> {
   try {
-    // If reset is set to true in config, delete the key from KV immediately
+    // If reset is set to true in config, delete the key from KV immediately.
     if (config.reset) {
       await kv.del(KV_KEY);
       return {};
@@ -45,22 +65,24 @@ async function handleSignup(formData: FormData) {
   "use server";
 
   const day = String(formData.get("day") ?? "");
+  const shift = String(formData.get("shift") ?? "") as ShiftId;
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
 
   // Validation
   if (!name || !email) return;
   if (!(DAYS as readonly string[]).includes(day)) return;
-  if (closedDays[day]) return; // store is closed that day
+  if (shift !== "morning" && shift !== "afternoon") return;
+  if (shiftClosed(day, shift)) return; // this specific slot is closed
 
-const data = await getSignups();
-  const dayList = data[day] ?? [];
+  const data = await getSignups();
+  const dd = dayData(data[day]);
 
-  // Re-verify capacity on the server before writing.
-  if (dayList.length >= CAPACITY) return;
+  // Re-verify this specific shift isn't full before writing.
+  if (dd[shift].length >= CAPACITY) return;
 
-  dayList.push({ name, email });
-  data[day] = dayList;
+  dd[shift].push({ name, email });
+  data[day] = dd;
 
   await kv.set(KV_KEY, data);
   revalidatePath("/market");
@@ -104,6 +126,165 @@ function PlusIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+function SunIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+function MoonIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// ------------------------------------------------------------------
+// Shift panel
+// ------------------------------------------------------------------
+function ShiftPanel({
+  day,
+  shift,
+  list,
+  isClosed,
+}: {
+  day: string;
+  shift: { id: ShiftId; label: string; time: string };
+  list: Signup[];
+  isClosed: boolean;
+}) {
+  const filled = Math.min(list.length, CAPACITY);
+  const isFull = filled >= CAPACITY;
+  const Icon = shift.id === "morning" ? SunIcon : MoonIcon;
+
+  return (
+    <div
+      className={[
+        "flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur",
+        isClosed ? "opacity-60" : "",
+      ].join(" ")}
+    >
+      {/* Shift header */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5 text-sm font-semibold text-white">
+            <Icon className="h-4 w-4 shrink-0 text-purple-300" />
+            {shift.label}
+          </div>
+          <div className="mt-0.5 whitespace-nowrap font-mono text-[11px] text-slate-400">
+            {shift.time}
+          </div>
+        </div>
+        {isClosed ? (
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            <LockIcon className="h-3 w-3" />
+            Closed
+          </span>
+        ) : isFull ? (
+          <span className="shrink-0 rounded-full border border-purple-400/40 bg-purple-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-purple-200">
+            Full {CAPACITY}/{CAPACITY}
+          </span>
+        ) : (
+          <span className="shrink-0 rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-300">
+            {filled}/{CAPACITY}
+          </span>
+        )}
+      </div>
+
+      {/* Slots */}
+      <ul className="mt-3 space-y-2">
+        {Array.from({ length: CAPACITY }).map((_, i) => {
+          const s = list[i];
+          if (s && !isClosed) {
+            return (
+              <li
+                key={i}
+                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2"
+              >
+                <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full border border-purple-400/40 bg-purple-400/10 text-purple-200">
+                  <CheckIcon className="h-3 w-3" />
+                </span>
+                <span className="truncate text-sm font-medium text-slate-100">
+                  {s.name}
+                </span>
+              </li>
+            );
+          }
+          return (
+            <li
+              key={i}
+              className="flex items-center gap-2 rounded-xl border border-dashed border-white/10 px-3 py-2 text-sm text-slate-500"
+            >
+              <span className="h-5 w-5 shrink-0 rounded-full border border-dashed border-white/20" />
+              {isClosed ? "—" : "Open slot"}
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Action */}
+      <div className="mt-3">
+        {isClosed ? (
+          <p className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-center text-[11px] text-slate-500">
+            Slot closed
+          </p>
+        ) : isFull ? (
+          <p className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-center text-[11px] text-slate-500">
+            Shift filled
+          </p>
+        ) : (
+          <details className="group/su">
+            <summary className="flex w-full cursor-pointer list-none items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white backdrop-blur transition-all hover:border-purple-400/40 hover:bg-white/10 [&::-webkit-details-marker]:hidden">
+              <PlusIcon className="h-4 w-4 transition-transform group-open/su:rotate-45" />
+              Sign Up
+            </summary>
+
+            <form action={handleSignup} className="mt-3 space-y-2">
+              <input type="hidden" name="day" value={day} />
+              <input type="hidden" name="shift" value={shift.id} />
+              <input
+                name="name"
+                type="text"
+                required
+                placeholder="Full Name"
+                autoComplete="name"
+                className="w-full rounded-xl border border-white/10 bg-[#0a0713]/70 px-4 py-2 text-sm text-white outline-none backdrop-blur transition-colors focus:border-purple-400/60"
+              />
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="Email"
+                autoComplete="email"
+                className="w-full rounded-xl border border-white/10 bg-[#0a0713]/70 px-4 py-2 text-sm text-white outline-none backdrop-blur transition-colors focus:border-purple-400/60"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-xl border border-purple-400/30 bg-purple-400/10 px-4 py-2 text-sm font-semibold text-purple-100 backdrop-blur transition-all hover:border-purple-400/60 hover:bg-purple-400/20"
+              >
+                Claim Slot
+              </button>
+            </form>
+          </details>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ------------------------------------------------------------------
 // Page
@@ -111,19 +292,27 @@ function PlusIcon({ className }: { className?: string }) {
 export default async function MarketPage() {
   const data = await getSignups();
 
-  const openDays = DAYS.filter((d) => !closedDays[d]);
-  const totalSlots = openDays.length * CAPACITY;
-  const filledSlots = openDays.reduce(
-    (sum, d) => sum + Math.min((data[d]?.length ?? 0), CAPACITY),
-    0
-  );
+  const openShiftSlots = (day: string) =>
+    SHIFTS.filter((sh) => !shiftClosed(day, sh.id)).length * CAPACITY;
+
+  const totalSlots = DAYS.reduce((s, d) => s + openShiftSlots(d), 0);
+  const filledSlots = DAYS.reduce((sum, d) => {
+    const dd = dayData(data[d]);
+    return (
+      sum +
+      SHIFTS.filter((sh) => !shiftClosed(d, sh.id)).reduce(
+        (a, sh) => a + Math.min(dd[sh.id].length, CAPACITY),
+        0
+      )
+    );
+  }, 0);
 
   return (
     <div className="mx-auto max-w-6xl">
       {/* Header */}
       <header className="mb-10">
         <div className="flex items-center gap-3">
-          <span className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-slate-900/60 text-purple-400 shadow-lg shadow-purple-900/20">
+          <span className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/5 text-purple-300 backdrop-blur">
             <StoreIcon className="h-6 w-6" />
           </span>
           <div>
@@ -131,8 +320,10 @@ export default async function MarketPage() {
               School Store Operations
             </h1>
             <p className="mt-1 text-sm text-slate-400">
-              Claim a daily volunteer shift at the Knights&apos; Market. Each day
-              runs with {CAPACITY} students — pick an open slot below.
+              Two shifts a day at the Knights&apos; Market —{" "}
+              <span className="text-slate-300">{CAPACITY} morning</span> &amp;{" "}
+              <span className="text-slate-300">{CAPACITY} afternoon</span>{" "}
+              volunteers. Claim an open slot below.
             </p>
           </div>
         </div>
@@ -142,9 +333,9 @@ export default async function MarketPage() {
           <span className="font-mono uppercase tracking-wider">
             {filledSlots}/{totalSlots} shifts filled this week
           </span>
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all"
+              className="h-full rounded-full bg-violet-400/80 transition-all"
               style={{
                 width: `${totalSlots ? (filledSlots / totalSlots) * 100 : 0}%`,
               }}
@@ -153,129 +344,69 @@ export default async function MarketPage() {
         </div>
       </header>
 
-      {/* Day grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      {/* Bento day grid */}
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-6">
         {DAYS.map((day) => {
-          const isClosed = Boolean(closedDays[day]);
-          const signups = data[day] ?? [];
-          const filled = Math.min(signups.length, CAPACITY);
-          const isFull = filled >= CAPACITY;
+          const dd = dayData(data[day]);
+          const closedFlags = SHIFTS.map((sh) => shiftClosed(day, sh.id));
+          const dayFullyClosed = closedFlags.every(Boolean);
+          const openShifts = SHIFTS.filter((sh) => !shiftClosed(day, sh.id));
+          const perDayOpen = openShifts.length * CAPACITY;
+          const dayFilled = openShifts.reduce(
+            (a, sh) => a + Math.min(dd[sh.id].length, CAPACITY),
+            0
+          );
 
           return (
-            <section
-              key={day}
-              className={[
-                "flex flex-col rounded-2xl border p-6 shadow-2xl backdrop-blur-xl transition-all",
-                isClosed
-                  ? "border-slate-800 bg-slate-900/40 opacity-70"
-                  : "border-slate-800 bg-slate-900/60 hover:border-purple-500/50 hover:shadow-purple-500/10",
-              ].join(" ")}
-            >
-              {/* Card header */}
-              <div className="flex items-start justify-between gap-2">
-                <h2 className="text-lg font-semibold text-white">{day}</h2>
-                {isClosed ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-800/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                    <LockIcon className="h-3 w-3" />
-                    Closed
-                  </span>
-                ) : isFull ? (
-                  <span className="rounded-full border border-purple-500/40 bg-purple-500/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-purple-300">
-                    Full ({CAPACITY}/{CAPACITY})
-                  </span>
-                ) : (
-                  <span className="rounded-full border border-slate-700 bg-slate-800/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-                    {filled}/{CAPACITY} filled
-                  </span>
-                )}
-              </div>
+            <div key={day} className={`group relative ${SPAN[day] ?? ""}`}>
+              {/* Card-stack layers */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 translate-y-2 rotate-[1.4deg] rounded-3xl border border-white/5 bg-[#140a28]/30 transition-transform duration-300 group-hover:translate-y-3.5 group-hover:rotate-[2.6deg]"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 translate-y-1 -rotate-[1deg] rounded-3xl border border-white/5 bg-[#140a28]/45 transition-transform duration-300 group-hover:translate-y-2 group-hover:-rotate-[2deg]"
+              />
 
-              {/* Slots */}
-              <ul className="mt-5 space-y-2">
-                {Array.from({ length: CAPACITY }).map((_, i) => {
-                  const s = signups[i];
-                  if (s) {
-                    return (
-                      <li
-                        key={i}
-                        className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2"
-                      >
-                        <span className="grid h-5 w-5 place-items-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 text-white">
-                          <CheckIcon className="h-3 w-3" />
-                        </span>
-                        <span className="truncate text-sm font-medium text-slate-100">
-                          {s.name}
-                        </span>
-                      </li>
-                    );
-                  }
-                  return (
-                    <li
-                      key={i}
-                      className={[
-                        "flex items-center gap-2 rounded-xl border border-dashed px-3 py-2 text-sm",
-                        isClosed
-                          ? "border-slate-800 text-slate-600"
-                          : "border-slate-700 text-slate-500",
-                      ].join(" ")}
-                    >
-                      <span className="h-5 w-5 rounded-full border border-dashed border-slate-600" />
-                      {isClosed ? "—" : "Open slot"}
-                    </li>
-                  );
-                })}
-              </ul>
+              {/* Main card */}
+              <section
+                className={[
+                  "relative flex flex-col rounded-3xl border p-6 backdrop-blur-xl transition-all duration-300 @container",
+                  dayFullyClosed
+                    ? "border-white/10 bg-[#140a28]/55 opacity-70"
+                    : "border-white/10 bg-[#140a28]/70 group-hover:-translate-y-1 group-hover:border-purple-400/40 group-hover:shadow-[0_24px_60px_-24px_rgba(168,85,247,0.5)]",
+                ].join(" ")}
+              >
+                {/* Day header */}
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-lg font-semibold text-white">{day}</h2>
+                  {dayFullyClosed ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                      <LockIcon className="h-3 w-3" />
+                      Closed
+                    </span>
+                  ) : (
+                    <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">
+                      {dayFilled}/{perDayOpen} filled
+                    </span>
+                  )}
+                </div>
 
-              {/* Action area */}
-              <div className="mt-5">
-                {isClosed ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="w-full cursor-not-allowed rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-2 text-sm font-medium text-slate-500"
-                  >
-                    Store Closed
-                  </button>
-                ) : isFull ? (
-                  <p className="rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-2 text-center text-xs text-slate-500">
-                    All slots filled
-                  </p>
-                ) : (
-                  <details className="group">
-                    <summary className="flex w-full cursor-pointer list-none items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-purple-900/30 transition-all hover:from-purple-500 hover:to-indigo-500 [&::-webkit-details-marker]:hidden">
-                      <PlusIcon className="h-4 w-4 transition-transform group-open:rotate-45" />
-                      Sign Up
-                    </summary>
-
-                    <form action={handleSignup} className="mt-3 space-y-2">
-                      <input type="hidden" name="day" value={day} />
-                      <input
-                        name="name"
-                        type="text"
-                        required
-                        placeholder="Full Name"
-                        autoComplete="name"
-                        className="w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-2 text-sm text-white outline-none transition-colors focus:border-purple-500"
-                      />
-                      <input
-                        name="email"
-                        type="email"
-                        required
-                        placeholder="Email"
-                        autoComplete="email"
-                        className="w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-2 text-sm text-white outline-none transition-colors focus:border-purple-500"
-                      />
-                      <button
-                        type="submit"
-                        className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-purple-900/30 transition-all hover:from-purple-500 hover:to-indigo-500"
-                      >
-                        Claim Slot
-                      </button>
-                    </form>
-                  </details>
-                )}
-              </div>
-            </section>
+                {/* Two shifts — stack on narrow cards, side-by-side on wide ones */}
+                <div className="mt-4 grid gap-3 @md:grid-cols-2">
+                  {SHIFTS.map((sh) => (
+                    <ShiftPanel
+                      key={sh.id}
+                      day={day}
+                      shift={sh}
+                      list={dd[sh.id]}
+                      isClosed={shiftClosed(day, sh.id)}
+                    />
+                  ))}
+                </div>
+              </section>
+            </div>
           );
         })}
       </div>

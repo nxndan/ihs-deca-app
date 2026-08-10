@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { Mail, Globe } from "lucide-react";
+import {Mail, Globe } from "lucide-react";
+
+const FOOTER_LINKS = [
+  { href: "/", label: "Announcements" },
+  { href: "/menu", label: "Menu" },
+  { href: "/rec", label: "LOR Request" },
+  { href: "/market", label: "Store Signups" },
+  { href: "/resources", label: "Resources" },
+] as const;
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -11,19 +19,19 @@ function InstagramIcon({ className }: { className?: string }) {
   );
 }
 
-const FOOTER_LINKS = [
-  { href: "/", label: "Announcements" },
-  { href: "/menu", label: "Menu" },
-  { href: "/rec", label: "LOR Request" },
-  { href: "/market", label: "Store Signups" },
-  { href: "/resources", label: "Resources" },
+/** Partner logos — files live in /public/partners. Add more here. */
+const PARTNERS = [
+  { name: "Muscular Dystrophy Association", src: "/partners/mda.png", maxH: "max-h-9" },
+  { name: "Dr Pepper", src: "/partners/dr-pepper.png", maxH: "max-h-12" },
 ] as const;
 
+/** Social placeholders — swap the `href="#"` values when accounts are ready. */
 const SOCIALS = [
   { href: "#", label: "Instagram", icon: InstagramIcon },
   { href: "#", label: "Email", icon: Mail },
   { href: "#", label: "Website", icon: Globe },
-];
+] as const;
+
 export function Footer() {
   const year = new Date().getFullYear();
 
@@ -86,19 +94,22 @@ export function Footer() {
               </ul>
             </div>
 
-            {/* Sponsors slot */}
+            {/* Partners */}
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Our Sponsors
+                Our Partners
               </h3>
-              {/* Placeholder tiles — replace with sponsor / chapter logos later. */}
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                {[0, 1, 2, 3].map((i) => (
+              <div className="mt-4 flex flex-col gap-3">
+                {PARTNERS.map((p) => (
                   <div
-                    key={i}
-                    className="grid h-14 place-items-center rounded-lg border border-dashed border-purple-bright/20 bg-white/[0.02] text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70"
+                    key={p.name}
+                    className="flex h-16 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] px-4"
                   >
-                    Logo
+                    <img
+                      src={p.src}
+                      alt={p.name}
+                      className={`${p.maxH} w-auto object-contain`}
+                    />
                   </div>
                 ))}
               </div>
@@ -108,7 +119,7 @@ export function Footer() {
           {/* Copyright bar */}
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-muted-foreground sm:flex-row">
             <p>© {year} Independence High School DECA. All rights reserved.</p>
-            <p>Built by the IHS DECA chapter.</p>
+            <p>Nandan Ramaswamy github.com/nxndan</p>
           </div>
         </div>
       </div>

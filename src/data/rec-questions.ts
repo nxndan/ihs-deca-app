@@ -56,10 +56,7 @@ export const REC_SECTIONS: Section[] = [
     title: "Nickname",
     description:
       "The name you go by, if it differs from your legal name. e.g. if your legal name is Jonathon and you go by Jon or Jack, list that here.",
-    fields: [
-      { id: "nickFirst", label: "First name", kind: "text", half: true },
-      { id: "nickLast", label: "Last name", kind: "text", half: true },
-    ],
+    fields: [{ id: "nickname", label: "Nickname", kind: "text" }],
   },
   {
     title: "Contact & Logistics",

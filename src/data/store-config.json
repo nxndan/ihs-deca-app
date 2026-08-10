@@ -1,11 +1,15 @@
 {
   "reset": false,
   "capacity": 2,
-  "closedDays": {
-    "Monday": false,
-    "Tuesday": false,
-    "Wednesday": false,
-    "Thursday": false,
-    "Friday": false
+  "shifts": [
+    { "id": "morning", "label": "Morning", "time": "8:30 – 9:00 AM" },
+    { "id": "afternoon", "label": "Afternoon", "time": "4:35 – 5:00 PM" }
+  ],
+  "closed": {
+    "Monday": { "morning": false, "afternoon": false },
+    "Tuesday": { "morning": false, "afternoon": false },
+    "Wednesday": { "morning": false, "afternoon": false },
+    "Thursday": { "morning": false, "afternoon": false },
+    "Friday": { "morning": false, "afternoon": true }
   }
 }
