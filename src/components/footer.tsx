@@ -14,18 +14,16 @@ function InstagramIcon({ className }: { className?: string }) {
 const FOOTER_LINKS = [
   { href: "/", label: "Announcements" },
   { href: "/menu", label: "Menu" },
-  { href: "/rec", label: "Chiles Rec" },
+  { href: "/rec", label: "LOR Request" },
   { href: "/market", label: "Store Signups" },
   { href: "/resources", label: "Resources" },
 ] as const;
 
-/** Social placeholders — swap the `href="#"` values when accounts are ready. */
 const SOCIALS = [
   { href: "#", label: "Instagram", icon: InstagramIcon },
   { href: "#", label: "Email", icon: Mail },
   { href: "#", label: "Website", icon: Globe },
-] as const;
-
+];
 export function Footer() {
   const year = new Date().getFullYear();
 
