@@ -1,21 +1,22 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { REC_SECTIONS, REC_FIELDS } from "@/data/rec-questions";
 
 export const runtime = "nodejs";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Where the questionnaire is delivered.
+// ------------------------------------------------------------------
+// Delivery via Gmail SMTP (free, no domain required, goes straight to
+// Mr. Chiles). Set two vars in .env.local:
+//   GMAIL_USER          the sending Gmail address (e.g. the chapter Gmail)
+//   GMAIL_APP_PASSWORD  a 16-char Google "App Password" (not the login pw)
+// See .env.example for how to create the App Password.
+// ------------------------------------------------------------------
 const TO = "chilesj@friscoisd.org";
-// Until ihsdeca.com is verified in Resend, use the shared onboarding sender.
-const FROM = "IHS DECA LOR <onboarding@resend.dev>";
+// A blind copy for the chapter, to confirm each submission actually sent.
+const COPY_TO = "contact.nandanr@gmail.com";
 
 function esc(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function answerToText(value: unknown): string {
@@ -41,6 +42,18 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { error: `Missing required fields: ${missing.map((f) => f.label).join("; ")}` },
       { status: 422 }
+    );
+  }
+
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  if (!user || !pass) {
+    return NextResponse.json(
+      {
+        error:
+          "Email is not configured yet (missing GMAIL_USER / GMAIL_APP_PASSWORD). See .env.example.",
+      },
+      { status: 500 }
     );
   }
 
@@ -87,24 +100,25 @@ export async function POST(req: Request) {
     </div>`;
 
   try {
-    const { error } = await resend.emails.send({
-      from: FROM,
-      to: [TO],
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user, pass },
+    });
+
+    await transporter.sendMail({
+      from: `IHS DECA LOR <${user}>`,
+      to: TO,
+      bcc: COPY_TO,
       replyTo: studentEmail || undefined,
       subject: `LOR Request — ${legalName}`,
       html,
     });
-    if (error) {
-      return NextResponse.json(
-        { error: error.message ?? "Email failed to send." },
-        { status: 502 }
-      );
-    }
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Unexpected error." },
-      { status: 500 }
+      { error: err instanceof Error ? err.message : "Email failed to send." },
+      { status: 502 }
     );
   }
 }
