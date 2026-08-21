@@ -1,15 +1,18 @@
 {
   "reset": false,
   "capacity": 2,
+  "managerCapacity": 2,
+  "managerPassword": "knightsmarket",
   "shifts": [
     { "id": "morning", "label": "Morning", "time": "8:30 – 9:00 AM" },
+    { "id": "advisory", "label": "Advisory Cart", "time": "12:15 – 12:50 PM" },
     { "id": "afternoon", "label": "Afternoon", "time": "4:35 – 5:00 PM" }
   ],
   "closed": {
-    "Monday": { "morning": false, "afternoon": false },
-    "Tuesday": { "morning": false, "afternoon": false },
-    "Wednesday": { "morning": false, "afternoon": false },
-    "Thursday": { "morning": false, "afternoon": false },
-    "Friday": { "morning": false, "afternoon": true }
+    "Monday": { "morning": false, "advisory": false, "afternoon": false },
+    "Tuesday": { "morning": false, "advisory": false, "afternoon": false },
+    "Wednesday": { "morning": false, "advisory": false, "afternoon": false },
+    "Thursday": { "morning": false, "advisory": false, "afternoon": false },
+    "Friday": { "morning": false, "advisory": false, "afternoon": true }
   }
 }

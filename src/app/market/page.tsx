@@ -1,92 +1,18 @@
-import { kv } from "@vercel/kv";
-import { revalidatePath } from "next/cache";
-import config from "@/data/store-config.json";
+import {
+  DAYS,
+  SHIFTS,
+  CAPACITY,
+  MANAGER_CAPACITY,
+  shiftClosed,
+  dayData,
+  getSignups,
+  type ShiftData,
+} from "./lib";
+import { handleVolunteerSignup } from "./actions";
+import { ManagerSignup } from "@/components/market/manager-signup";
 
 // Always fetch the latest signup state on every request.
 export const dynamic = "force-dynamic";
-
-// ------------------------------------------------------------------
-// Types & config
-// ------------------------------------------------------------------
-type Signup = { name: string; email: string };
-type ShiftId = "morning" | "afternoon";
-type DayData = Record<ShiftId, Signup[]>;
-// Stored value may be a DayData object, or (legacy) a flat array.
-type SignupData = Record<string, DayData | Signup[]>;
-
-const KV_KEY = "store_signups";
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] as const;
-
-// Per-shift capacity (2 morning + 2 afternoon = 4 per day).
-const CAPACITY: number = (config as { capacity?: number }).capacity ?? 2;
-const SHIFTS = config.shifts as { id: ShiftId; label: string; time: string }[];
-// Closures are per shift now: closed[day][shift] === true disables just that slot.
-const closed = config.closed as Record<string, Partial<Record<ShiftId, boolean>>>;
-
-function shiftClosed(day: string, shift: ShiftId): boolean {
-  return Boolean(closed[day]?.[shift]);
-}
-
-// Bento spans — three medium tiles on top, two wide tiles below.
-const SPAN: Record<string, string> = {
-  Monday: "lg:col-span-2",
-  Tuesday: "lg:col-span-2",
-  Wednesday: "lg:col-span-2",
-  Thursday: "lg:col-span-3",
-  Friday: "lg:col-span-3",
-};
-
-// Normalize whatever is stored for a day into { morning, afternoon }.
-function dayData(raw: unknown): DayData {
-  if (Array.isArray(raw)) return { morning: raw as Signup[], afternoon: [] };
-  const o = (raw ?? {}) as Partial<DayData>;
-  return { morning: o.morning ?? [], afternoon: o.afternoon ?? [] };
-}
-
-// Read helper — tolerant of a not-yet-provisioned KV store so the page
-// still renders in local dev before Vercel KV is connected.
-async function getSignups(): Promise<SignupData> {
-  try {
-    // If reset is set to true in config, delete the key from KV immediately.
-    if (config.reset) {
-      await kv.del(KV_KEY);
-      return {};
-    }
-    return (await kv.get<SignupData>(KV_KEY)) ?? {};
-  } catch {
-    return {};
-  }
-}
-
-// ------------------------------------------------------------------
-// Server Action
-// ------------------------------------------------------------------
-async function handleSignup(formData: FormData) {
-  "use server";
-
-  const day = String(formData.get("day") ?? "");
-  const shift = String(formData.get("shift") ?? "") as ShiftId;
-  const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim();
-
-  // Validation
-  if (!name || !email) return;
-  if (!(DAYS as readonly string[]).includes(day)) return;
-  if (shift !== "morning" && shift !== "afternoon") return;
-  if (shiftClosed(day, shift)) return; // this specific slot is closed
-
-  const data = await getSignups();
-  const dd = dayData(data[day]);
-
-  // Re-verify this specific shift isn't full before writing.
-  if (dd[shift].length >= CAPACITY) return;
-
-  dd[shift].push({ name, email });
-  data[day] = dd;
-
-  await kv.set(KV_KEY, data);
-  revalidatePath("/market");
-}
 
 // ------------------------------------------------------------------
 // Inline icons (no external icon libraries)
@@ -152,24 +78,47 @@ function MoonIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+function CartIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M3 4h2l2.2 11a1.5 1.5 0 0 0 1.5 1.2h8.1a1.5 1.5 0 0 0 1.5-1.2L21 7H6"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="9" cy="20" r="1.3" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="17" cy="20" r="1.3" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+function shiftIcon(id: string) {
+  if (id === "morning") return SunIcon;
+  if (id === "afternoon") return MoonIcon;
+  return CartIcon;
+}
 
 // ------------------------------------------------------------------
-// Shift panel
+// Shift panel — volunteers (prominent) + managers (compact)
 // ------------------------------------------------------------------
 function ShiftPanel({
   day,
   shift,
-  list,
+  data,
   isClosed,
 }: {
   day: string;
-  shift: { id: ShiftId; label: string; time: string };
-  list: Signup[];
+  shift: { id: string; label: string; time: string };
+  data: ShiftData;
   isClosed: boolean;
 }) {
-  const filled = Math.min(list.length, CAPACITY);
-  const isFull = filled >= CAPACITY;
-  const Icon = shift.id === "morning" ? SunIcon : MoonIcon;
+  const Icon = shiftIcon(shift.id);
+  const volFilled = Math.min(data.volunteers.length, CAPACITY);
+  const volFull = volFilled >= CAPACITY;
+  const mgrFilled = Math.min(data.managers.length, MANAGER_CAPACITY);
+  const mgrFull = mgrFilled >= MANAGER_CAPACITY;
 
   return (
     <div
@@ -194,21 +143,21 @@ function ShiftPanel({
             <LockIcon className="h-3 w-3" />
             Closed
           </span>
-        ) : isFull ? (
+        ) : volFull ? (
           <span className="shrink-0 rounded-full border border-purple-400/40 bg-purple-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-purple-200">
             Full {CAPACITY}/{CAPACITY}
           </span>
         ) : (
           <span className="shrink-0 rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-            {filled}/{CAPACITY}
+            {volFilled}/{CAPACITY}
           </span>
         )}
       </div>
 
-      {/* Slots */}
+      {/* Volunteer slots */}
       <ul className="mt-3 space-y-2">
         {Array.from({ length: CAPACITY }).map((_, i) => {
-          const s = list[i];
+          const s = data.volunteers[i];
           if (s && !isClosed) {
             return (
               <li
@@ -236,13 +185,13 @@ function ShiftPanel({
         })}
       </ul>
 
-      {/* Action */}
+      {/* Volunteer action */}
       <div className="mt-3">
         {isClosed ? (
           <p className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-center text-[11px] text-slate-500">
             Slot closed
           </p>
-        ) : isFull ? (
+        ) : volFull ? (
           <p className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-center text-[11px] text-slate-500">
             Shift filled
           </p>
@@ -253,7 +202,7 @@ function ShiftPanel({
               Sign Up
             </summary>
 
-            <form action={handleSignup} className="mt-3 space-y-2">
+            <form action={handleVolunteerSignup} className="mt-3 space-y-2">
               <input type="hidden" name="day" value={day} />
               <input type="hidden" name="shift" value={shift.id} />
               <input
@@ -282,6 +231,54 @@ function ShiftPanel({
           </details>
         )}
       </div>
+
+      {/* Managers — compact / inconspicuous */}
+      <div className="mt-4 border-t border-white/10 pt-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Managers
+          </span>
+          {!isClosed && (
+            <span className="text-[10px] font-medium text-slate-500">
+              {mgrFilled}/{MANAGER_CAPACITY}
+            </span>
+          )}
+        </div>
+
+        <ul className="mt-2 space-y-1.5">
+          {Array.from({ length: MANAGER_CAPACITY }).map((_, i) => {
+            const m = data.managers[i];
+            if (m && !isClosed) {
+              return (
+                <li
+                  key={i}
+                  className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.02] px-2.5 py-1"
+                >
+                  <span className="grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full border border-purple-400/30 text-purple-300">
+                    <CheckIcon className="h-2 w-2" />
+                  </span>
+                  <span className="truncate text-xs text-slate-400">{m.name}</span>
+                </li>
+              );
+            }
+            return (
+              <li
+                key={i}
+                className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/[0.08] px-2.5 py-1 text-xs text-slate-600"
+              >
+                <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-dashed border-white/15" />
+                {isClosed ? "—" : "Open manager slot"}
+              </li>
+            );
+          })}
+        </ul>
+
+        {!isClosed && !mgrFull && (
+          <div className="mt-2">
+            <ManagerSignup day={day} shiftId={shift.id} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -291,17 +288,24 @@ function ShiftPanel({
 // ------------------------------------------------------------------
 export default async function MarketPage() {
   const data = await getSignups();
+  const perShift = CAPACITY + MANAGER_CAPACITY;
 
-  const openShiftSlots = (day: string) =>
-    SHIFTS.filter((sh) => !shiftClosed(day, sh.id)).length * CAPACITY;
+  const openShifts = (day: string) =>
+    SHIFTS.filter((sh) => !shiftClosed(day, sh.id));
 
-  const totalSlots = DAYS.reduce((s, d) => s + openShiftSlots(d), 0);
+  const totalSlots = DAYS.reduce(
+    (s, d) => s + openShifts(d).length * perShift,
+    0
+  );
   const filledSlots = DAYS.reduce((sum, d) => {
     const dd = dayData(data[d]);
     return (
       sum +
-      SHIFTS.filter((sh) => !shiftClosed(d, sh.id)).reduce(
-        (a, sh) => a + Math.min(dd[sh.id].length, CAPACITY),
+      openShifts(d).reduce(
+        (a, sh) =>
+          a +
+          Math.min(dd[sh.id].volunteers.length, CAPACITY) +
+          Math.min(dd[sh.id].managers.length, MANAGER_CAPACITY),
         0
       )
     );
@@ -320,10 +324,11 @@ export default async function MarketPage() {
               School Store Operations
             </h1>
             <p className="mt-1 text-sm text-slate-400">
-              Two shifts a day at the Knights&apos; Market —{" "}
-              <span className="text-slate-300">{CAPACITY} morning</span> &amp;{" "}
-              <span className="text-slate-300">{CAPACITY} afternoon</span>{" "}
-              volunteers. Claim an open slot below.
+              Three shifts a day at the Knights&apos; Market —{" "}
+              <span className="text-slate-300">
+                {CAPACITY} volunteers + {MANAGER_CAPACITY} managers
+              </span>{" "}
+              per shift. Claim an open slot below.
             </p>
           </div>
         </div>
@@ -331,7 +336,7 @@ export default async function MarketPage() {
         {/* Week-at-a-glance */}
         <div className="mt-6 flex items-center gap-3 text-xs text-slate-400">
           <span className="font-mono uppercase tracking-wider">
-            {filledSlots}/{totalSlots} shifts filled this week
+            {filledSlots}/{totalSlots} positions filled this week
           </span>
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
             <div
@@ -344,63 +349,51 @@ export default async function MarketPage() {
         </div>
       </header>
 
-      {/* Bento day grid */}
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-6">
+      {/* Day cards — one per row, three shifts across on wide screens */}
+      <div className="grid grid-cols-1 gap-6">
         {DAYS.map((day) => {
           const dd = dayData(data[day]);
-          const closedFlags = SHIFTS.map((sh) => shiftClosed(day, sh.id));
-          const dayFullyClosed = closedFlags.every(Boolean);
-          const openShifts = SHIFTS.filter((sh) => !shiftClosed(day, sh.id));
-          const perDayOpen = openShifts.length * CAPACITY;
-          const dayFilled = openShifts.reduce(
-            (a, sh) => a + Math.min(dd[sh.id].length, CAPACITY),
-            0
-          );
+          const dayFullyClosed = SHIFTS.every((sh) => shiftClosed(day, sh.id));
 
           return (
-            <div key={day} className={`group relative ${SPAN[day] ?? ""}`}>
+            <div key={day} className="group relative">
               {/* Card-stack layers */}
               <div
                 aria-hidden="true"
-                className="absolute inset-0 translate-y-2 rotate-[1.4deg] rounded-3xl border border-white/5 bg-[#140a28]/30 transition-transform duration-300 group-hover:translate-y-3.5 group-hover:rotate-[2.6deg]"
+                className="absolute inset-0 translate-y-2 rotate-[0.6deg] rounded-3xl border border-white/5 bg-[#140a28]/30 transition-transform duration-300 group-hover:translate-y-3 group-hover:rotate-[1.2deg]"
               />
               <div
                 aria-hidden="true"
-                className="absolute inset-0 translate-y-1 -rotate-[1deg] rounded-3xl border border-white/5 bg-[#140a28]/45 transition-transform duration-300 group-hover:translate-y-2 group-hover:-rotate-[2deg]"
+                className="absolute inset-0 translate-y-1 -rotate-[0.5deg] rounded-3xl border border-white/5 bg-[#140a28]/45 transition-transform duration-300 group-hover:translate-y-2 group-hover:-rotate-[1deg]"
               />
 
               {/* Main card */}
               <section
                 className={[
-                  "relative flex flex-col rounded-3xl border p-6 backdrop-blur-xl transition-all duration-300 @container",
+                  "@container relative flex flex-col rounded-3xl border p-6 backdrop-blur-xl transition-all duration-300",
                   dayFullyClosed
                     ? "border-white/10 bg-[#140a28]/55 opacity-70"
-                    : "border-white/10 bg-[#140a28]/70 group-hover:-translate-y-1 group-hover:border-purple-400/40 group-hover:shadow-[0_24px_60px_-24px_rgba(168,85,247,0.5)]",
+                    : "border-white/10 bg-[#140a28]/70 group-hover:border-purple-400/40 group-hover:shadow-[0_24px_60px_-24px_rgba(168,85,247,0.5)]",
                 ].join(" ")}
               >
-                {/* Day header */}
                 <div className="flex items-center justify-between gap-2">
                   <h2 className="text-lg font-semibold text-white">{day}</h2>
-                  {dayFullyClosed ? (
+                  {dayFullyClosed && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
                       <LockIcon className="h-3 w-3" />
                       Closed
                     </span>
-                  ) : (
-                    <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-                      {dayFilled}/{perDayOpen} filled
-                    </span>
                   )}
                 </div>
 
-                {/* Two shifts — stack on narrow cards, side-by-side on wide ones */}
-                <div className="mt-4 grid gap-3 @md:grid-cols-2">
+                {/* Shifts */}
+                <div className="mt-4 grid gap-3 @md:grid-cols-2 @2xl:grid-cols-3">
                   {SHIFTS.map((sh) => (
                     <ShiftPanel
                       key={sh.id}
                       day={day}
                       shift={sh}
-                      list={dd[sh.id]}
+                      data={dd[sh.id]}
                       isClosed={shiftClosed(day, sh.id)}
                     />
                   ))}
