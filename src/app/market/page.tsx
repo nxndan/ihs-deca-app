@@ -299,12 +299,12 @@ export default async function MarketPage() {
           </span>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              School Store Operations
+              The Knights Market Shifts
             </h1>
             <p className="mt-1 text-sm text-slate-400">
-              Three shifts a day at the Knights&apos; Market —{" "}
+              Sign up to volunteer at The Knights Market —{" "}
               <span className="text-slate-300">
-                {CAPACITY} volunteers + {MANAGER_CAPACITY} managers
+                {CAPACITY} volunteers + {MANAGER_CAPACITY} officers
               </span>{" "}
               per shift. Claim an open slot below.
             </p>

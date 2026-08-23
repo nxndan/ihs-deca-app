@@ -56,7 +56,7 @@ export function Footer() {
                 </span>
               </div>
               <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                Independence High School DECA — preparing emerging leaders and
+                preparing emerging leaders and
                 entrepreneurs in marketing, finance, hospitality, and management.
               </p>
 
@@ -119,7 +119,7 @@ export function Footer() {
           {/* Copyright bar */}
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-muted-foreground sm:flex-row">
             <p>© {year} Independence High School DECA. All rights reserved.</p>
-            <p>Nandan Ramaswamy github.com/nxndan</p>
+            <p>Follow @ihsknightsdeca on Instagram</p>
           </div>
         </div>
       </div>

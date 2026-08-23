@@ -27,7 +27,7 @@ export function Announcements({ items }: { items: Announcement[] }) {
             Announcements Bulletin
           </h2>
           <p className="text-sm text-muted-foreground">
-            Latest news and important updates for IHS DECA members.
+            Check here for IHS DECA's latest updates
           </p>
         </div>
       </header>
@@ -52,7 +52,7 @@ export function Announcements({ items }: { items: Announcement[] }) {
               {item.summary}
             </p>
             <span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-violet-glow">
-              Read full announcement →
+              Expand
             </span>
           </TiltCard>
         ))}

@@ -5,29 +5,22 @@ import { MembershipButton } from "@/components/membership-button";
 const announcements: Announcement[] = [
   {
     id: 1,
-    title: "Welcome to IHS DECA!",
-    date: "August 2026",
+    title: "First Chapter Meeting",
+    date: "08/26/2026",
     summary:
-      "Welcome to our official app — meeting times, competition dates, and store news will all live right here.",
-    body: `Welcome to the official IHS DECA app!
-
-This is home base for the chapter this year. We'll post meeting reminders, competition registration deadlines, conference travel details, and school store updates here as they happen.
-
-Bookmark the page and check back often — the newest announcements always sit at the top. If you're new to DECA, introduce yourself at the next meeting and grab a member handbook.
-
-Let's make it a great season, Knights.`,
+      "Our first chapter meeting will be after school on Wednsday August 26 2026 in the cafeteria.",
+    body: `Our first chapter meeting will be after school on Wednsday August 26 2026 in the cafeteria. 
+    Join us for general information on DECA, precomp, the school store, and much more! 
+    Bring your friends, everyone is welcome. We can't wait to see you there!`,
   },
   {
     id: 2,
-    title: "First Chapter Meeting",
-    date: "Upcoming",
+    title: "The Rumble",
+    date: "08/08/2026",
     summary:
-      "We kick off the season in the auditorium next Tuesday right after school — everyone welcome.",
-    body: `Our first chapter meeting of the year is next Tuesday in the auditorium, right after the final bell.
-
-On the agenda: an overview of the competitive events, the conference calendar, officer introductions, and how the school store works this year. We'll also hand out membership forms and answer any questions about getting started.
-
-No experience needed and no commitment required to come check it out — bring a friend. Snacks will be provided.`,
+      "Catch IHS DECA at the Rumble this Saturday from 8 am to 11 am! Stop by our booth for information on competition this year!",
+    body: `Catch IHS DECA at the Rumble this Saturday from 8 am to 11 am! Stop by our booth for information on competition this year,
+    some cold drinks from the Knights Market, and a fun game of cornhole for a chance to win a free IHS DECA t-shirt!`,
   },
 ];
 
@@ -44,9 +37,10 @@ export default function Home() {
           </h1>
 
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            Announcements, the Knights&apos; Market menu, recommendation
-            requests, store sign-ups, and competition resources — everything our
-            chapter needs, in one place.
+            Welcome to the award-winning IndyDECA chapter website! Established in 2014, 
+            Independence DECA has grown to 400+ members, sending 100+ to SCDC, and 30+ to ICDC
+            with multiple top 10 finishes. This site was built as a home for the chapter's members,
+            officers, and decorated, gold certified Knights Market.   
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
