@@ -4,9 +4,11 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   IHS DECA — PURPLE × BLACK THEME
-   Lighting lives on the UI (neon borders, glass edges, hover
-   lines) rather than in ambient background spotlights.
+   IHS DECA — DESIGN SYSTEM
+   Deep charcoal surfaces, white type, clean neutral grays.
+   A single Deep Royal Purple is reserved strictly for primary
+   CTAs and active indicators. No gradients, ambient glow, or
+   glassmorphism.
    ============================================================ */
 @theme inline {
   --color-background: var(--background);
@@ -25,106 +27,122 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  /* Solid, opaque surfaces */
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+
+  /* Type */
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-heading);
+  --font-display: var(--font-display);
+  /* Legacy aliases used across pages remap onto the new families. */
+  --font-heading: var(--font-display);
+  --font-subhead: var(--font-display);
 
-  /* --- Purple × Black brand palette --- */
-  --color-ink: #08060f;
-  --color-purple-deep: #2e1065;
-  --color-purple: #7c3aed;
-  --color-purple-bright: #a855f7;
-  --color-violet-glow: #c084fc;
-  --color-magenta: #d946ef;
+  /* The single accent — Deep Royal Purple. Legacy purple/violet/
+     magenta tokens are aliased to it so no stray hues remain. */
+  --color-royal: #5b21b6;
+  --color-royal-bright: #6d28d9;
+  --color-royal-deep: #4c1d95;
+  --color-purple: #5b21b6;
+  --color-purple-deep: #4c1d95;
+  --color-purple-bright: #6d28d9;
+  --color-violet-glow: #8b5cf6;
+  --color-magenta: #6d28d9;
 
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
+  /* Tight, deliberate radii (4–10px) */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.625rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 0.875rem;
 }
 
+/* Light mode kept sane (site ships dark). */
 :root {
-  --background: #ffffff;
-  --foreground: #0b0713;
+  --background: #f8fafc;
+  --foreground: #14151a;
+  --surface-1: #ffffff;
+  --surface-2: #f1f3f7;
   --card: #ffffff;
-  --card-foreground: #0b0713;
+  --card-foreground: #14151a;
   --popover: #ffffff;
-  --popover-foreground: #0b0713;
-  --primary: #7c3aed;
+  --popover-foreground: #14151a;
+  --primary: #5b21b6;
   --primary-foreground: #ffffff;
-  --secondary: #f3effc;
-  --secondary-foreground: #2e1065;
-  --muted: #f4f2fa;
-  --muted-foreground: #6b6480;
-  --accent: #f0e9ff;
-  --accent-foreground: #2e1065;
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: #e7e1f5;
-  --input: #e7e1f5;
-  --ring: #a855f7;
-  --radius: 0.85rem;
+  --secondary: #f1f3f7;
+  --secondary-foreground: #262a33;
+  --muted: #f1f3f7;
+  --muted-foreground: #64697a;
+  --accent: #eef0f5;
+  --accent-foreground: #262a33;
+  --destructive: #b42318;
+  --border: #e3e6ec;
+  --border-strong: #d0d4dd;
+  --input: #e3e6ec;
+  --ring: #6d28d9;
+  --radius: 0.5rem;
 }
 
+/* Dark mode — the shipped look: deep warm charcoal. */
 .dark {
-  --background: #08060f;
-  --foreground: oklch(0.97 0.012 300);
-  --card: #100a1f;
-  --card-foreground: oklch(0.97 0.012 300);
-  --popover: #120b24;
-  --popover-foreground: oklch(0.97 0.012 300);
-  --primary: #8b5cf6;
-  --primary-foreground: #0b0713;
-  --secondary: #180f2e;
-  --secondary-foreground: oklch(0.97 0.012 300);
-  --muted: #150d28;
-  --muted-foreground: oklch(0.72 0.03 300);
-  --accent: #2e1065;
-  --accent-foreground: #e9d5ff;
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: #a855f7;
+  --background: #131217;
+  --foreground: #f4f2f7;
+  --surface-1: #1a181f;
+  --surface-2: #221f28;
+  --card: #1a181f;
+  --card-foreground: #f4f2f7;
+  --popover: #1a181f;
+  --popover-foreground: #f4f2f7;
+  --primary: #6d28d9;
+  --primary-foreground: #ffffff;
+  --secondary: #221f28;
+  --secondary-foreground: #f4f2f7;
+  --muted: #221f28;
+  --muted-foreground: #a29dad;
+  --accent: #221f28;
+  --accent-foreground: #f4f2f7;
+  --destructive: #f87171;
+  --border: #2a2732;
+  --border-strong: #3a3744;
+  --input: #2a2732;
+  --ring: #7c3aed;
+  --radius: 0.5rem;
 }
 
 /* ============================================================
-   KEYFRAMES
+   KEYFRAMES — minimal, transient only
    ============================================================ */
-@keyframes gradient-pan {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
-}
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 18px -2px var(--color-purple-bright), 0 0 40px -10px var(--color-magenta); }
-  50%      { box-shadow: 0 0 28px 2px var(--color-magenta), 0 0 60px -6px var(--color-purple-bright); }
-}
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-6px); }
-}
-@keyframes loader-slide {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-@keyframes caret-blink {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0; }
-}
-@keyframes edge-sweep {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
 @keyframes modal-in {
-  0%   { opacity: 0; transform: translateY(8px) scale(0.97); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes logo-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes route-loader-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes loader-pulse {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.04); }
+}
+@keyframes loading-dots {
+  0%   { content: ""; }
+  25%  { content: "."; }
+  50%  { content: ".."; }
+  75%, 100% { content: "..."; }
 }
 
 /* ============================================================
-   BASE — flat background, no ambient spotlights
+   BASE — typography, rhythm, surfaces
    ============================================================ */
 @layer base {
   * {
@@ -138,208 +156,183 @@
     background-color: var(--background);
     color: var(--foreground);
     min-height: 100dvh;
+    font-size: 1rem;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
-  h1, h2, h3, h4 {
-    font-family: var(--font-heading), var(--font-sans), sans-serif;
-    letter-spacing: -0.015em;
+
+  /* Display headings — Plus Jakarta Sans, heavy weight. */
+  h1, h2 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
   }
+  /* Sub-headings — same family, lighter weight, comfortable tracking. */
+  h3, h4 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  a { text-underline-offset: 3px; }
+
+  /* Consistent keyboard focus ring across interactive elements. */
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-royal-bright);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
   ::selection {
-    background: color-mix(in oklch, var(--color-purple-bright) 45%, transparent);
+    background: var(--color-royal);
     color: #fff;
   }
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
+
+  /* Neutral scrollbar — no accent. */
+  ::-webkit-scrollbar { width: 12px; height: 12px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
     border-radius: 9999px;
-    border: 2px solid transparent;
-    background: linear-gradient(var(--color-purple), var(--color-magenta)) padding-box;
+    border: 3px solid var(--background);
+    background: var(--border-strong);
   }
-  ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(var(--color-purple-bright), var(--color-magenta)) padding-box;
-  }
+  ::-webkit-scrollbar-thumb:hover { background: #4a4654; }
 }
 
 /* ============================================================
-   COMPONENT LAYER
+   COMPONENT LAYER — solid surfaces, 1px borders, fast hovers
    ============================================================ */
 @layer components {
-  /* Neon-bordered glass card with an Apple-style top edge highlight
-     and a purple hairline that sweeps in on hover. */
+  /* Eyebrow / kicker — mono, uppercase, tracked. */
+  .eyebrow {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  /* Solid card surface with a hairline border. */
   .card-glow {
-    position: relative;
-    border-radius: var(--radius-xl);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012));
-    border: 1px solid color-mix(in oklch, var(--color-purple-bright) 18%, transparent);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
   }
-  .card-glow::before {
-    content: "";
-    position: absolute;
-    left: 1.25rem;
-    right: 1.25rem;
-    top: -1px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--color-purple-bright), var(--color-magenta), transparent);
-    opacity: 0;
-    transition: opacity 0.35s ease;
-    pointer-events: none;
-  }
-  .card-glow:hover {
-    transform: translateY(-4px);
-    border-color: color-mix(in oklch, var(--color-purple-bright) 55%, transparent);
-    box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
-      0 0 0 1px color-mix(in oklch, var(--color-purple) 35%, transparent),
-      0 18px 45px -22px color-mix(in oklch, var(--color-magenta) 65%, transparent);
-  }
-  .card-glow:hover::before { opacity: 1; }
+  .card-glow:hover { border-color: var(--border-strong); }
 
-  /* Sweeping shine on hover (buttons, badges). */
-  .shimmer { position: relative; overflow: hidden; }
-  .shimmer::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    transform: translateX(-130%) skewX(-18deg);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
-    transition: transform 0.7s ease;
-    pointer-events: none;
-  }
-  .shimmer:hover::after { transform: translateX(130%) skewX(-18deg); }
-
-  /* Page-loader indeterminate bar. */
-  .loader-bar {
-    animation: loader-slide 1.1s ease-in-out infinite;
-  }
-
-  /* Typewriter caret. */
-  .typed-caret {
-    display: inline-block;
-    margin-left: 0.06em;
-    color: var(--color-purple-bright);
-    text-shadow: 0 0 16px color-mix(in oklch, var(--color-purple-bright) 75%, transparent);
-    font-weight: 400;
-  }
-  .typed-caret--blink { animation: caret-blink 1s step-end infinite; }
-
-  /* Glass tilt card (announcements): border + top edge highlight; the tilt
-     transform and glare are driven by JS. No purple background glow. */
+  /* Former tilt card → flat, no motion. */
   .tilt-card {
-    position: relative;
-    border-radius: var(--radius-xl);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
-    border: 1px solid color-mix(in oklch, var(--color-purple-bright) 20%, transparent);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-    overflow: hidden;
-    will-change: transform;
-    transition: transform 0.15s ease-out, border-color 0.2s ease, box-shadow 0.2s ease;
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
   }
   .tilt-card:hover {
-    border-color: color-mix(in oklch, var(--color-purple-bright) 48%, transparent);
-    box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
-      0 24px 45px -26px rgba(0, 0, 0, 0.85);
+    border-color: var(--border-strong);
+    background: var(--surface-2);
   }
-  .tilt-glare {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
+  .tilt-glare { display: none; }
+
+  /* Primary CTA — the one place the accent fills a surface. */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-md);
+    background: var(--color-royal);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: background-color 0.15s ease;
+  }
+  .btn-primary:hover { background: var(--color-royal-bright); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* Secondary — neutral outline. */
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--foreground);
+    border: 1px solid var(--border-strong);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .btn-secondary:hover {
+    border-color: var(--foreground);
+    background: var(--surface-1);
   }
 
-  /* Modal enter animation. */
-  .animate-modal-in { animation: modal-in 0.25s ease-out both; }
+  .animate-modal-in { animation: modal-in 0.18s ease-out both; }
+
+  /* Slowly rotating hero mark. */
+  .logo-spin { animation: logo-spin 18s linear infinite; }
+
+  /* Page-transition loading screen. */
+  .route-loader { animation: route-loader-in 0.15s ease-out both; }
+  .route-loader__mark { animation: loader-pulse 1s ease-in-out infinite; }
+  .loading-dots::after {
+    content: "";
+    animation: loading-dots 1.2s steps(1) infinite;
+  }
 }
 
 /* ============================================================
-   UTILITIES
+   UTILITIES — legacy class names remapped to the flat system
    ============================================================ */
 
-/* Frosted glass surface with a crisp top edge (navbar, footer). */
+/* Bars (navbar / footer): solid, opaque, no blur. */
 @utility glass {
-  background-color: color-mix(in oklch, var(--card) 55%, transparent);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  border: 1px solid color-mix(in oklch, var(--color-purple-bright) 16%, transparent);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+  background-color: var(--surface-1);
 }
 
-/* Glass panel: hairline border + inset top highlight for large sections. */
+/* Panels / sections: solid surface, hairline border, no blur. */
 @utility glass-edge {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.006));
-  border: 1px solid color-mix(in oklch, var(--color-purple-bright) 16%, transparent);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.09);
+  background-color: var(--surface-1);
+  border: 1px solid var(--border);
 }
 
-/* Neon glow rings. */
-@utility glow-purple {
-  box-shadow:
-    0 0 0 1px color-mix(in oklch, var(--color-purple-bright) 45%, transparent),
-    0 10px 34px -10px color-mix(in oklch, var(--color-purple-bright) 70%, transparent);
-}
-@utility glow-magenta {
-  box-shadow:
-    0 0 0 1px color-mix(in oklch, var(--color-magenta) 45%, transparent),
-    0 10px 34px -10px color-mix(in oklch, var(--color-magenta) 75%, transparent);
-}
+/* Former glow rings → no shadow. */
+@utility glow-purple { box-shadow: none; }
+@utility glow-magenta { box-shadow: none; }
+@utility text-glow-purple { text-shadow: none; }
+@utility pulse-glow { animation: none; }
 
-@utility pulse-glow { animation: pulse-glow 3.6s ease-in-out infinite; }
-@utility float-slow { animation: float-slow 5s ease-in-out infinite; }
+/* Former brand gradient/glow text → legible solid color (inherits). */
+@utility text-gradient-brand { color: inherit; }
 
-@utility text-glow-purple {
-  text-shadow: 0 0 22px color-mix(in oklch, var(--color-purple-bright) 80%, transparent);
-}
-
-/* Animated gradient text (violet -> fuchsia -> purple, panning). */
-@utility text-gradient-brand {
-  background-image: linear-gradient(100deg,
-    var(--color-violet-glow),
-    var(--color-magenta),
-    var(--color-purple-bright),
-    var(--color-violet-glow));
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: gradient-pan 6s linear infinite;
-}
-
-/* Glowing hairline divider — static neon line. */
+/* Neutral hairline divider — no accent. */
 @utility brand-hairline {
   height: 1px;
-  background-image: linear-gradient(90deg,
-    transparent,
-    color-mix(in oklch, var(--color-purple-bright) 65%, transparent),
-    color-mix(in oklch, var(--color-magenta) 65%, transparent),
-    transparent);
+  background-color: var(--border);
+  background-image: none;
 }
-
-/* Animated neon hairline — the same line, gently sweeping. */
 @utility brand-hairline-anim {
   height: 1px;
-  background-image: linear-gradient(90deg,
-    transparent,
-    color-mix(in oklch, var(--color-purple-bright) 70%, transparent),
-    color-mix(in oklch, var(--color-magenta) 70%, transparent),
-    transparent);
-  background-size: 200% 100%;
-  animation: edge-sweep 6s linear infinite;
+  background-color: var(--border);
+  background-image: none;
+  animation: none;
 }
+
+/* Keep the background watermark perfectly still. */
+@utility float-slow { animation: none; }
 
 /* ============================================================
    MOTION SAFETY
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   *,
-  .text-gradient-brand,
-  .pulse-glow,
-  .float-slow,
-  .loader-bar,
-  .typed-caret--blink,
-  .brand-hairline-anim {
+  .animate-modal-in {
     animation: none !important;
     transition: none !important;
   }

@@ -28,7 +28,7 @@ export function MembershipButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="shimmer glow-purple inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple to-magenta px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.03]"
+        className="btn-primary h-11 px-5"
       >
         <UserPlus className="h-4 w-4" />
         Become a Member
@@ -45,21 +45,19 @@ export function MembershipButton() {
           <button
             aria-label="Close"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 cursor-default bg-black/65 backdrop-blur-sm"
+            className="absolute inset-0 cursor-default bg-black/70"
           />
 
           {/* Panel */}
-          <div className="animate-modal-in glass-edge relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl">
-            <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4">
-              <h2 className="font-heading text-lg font-bold tracking-tight">
-                Membership Form
-              </h2>
+          <div className="animate-modal-in relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-border bg-surface-1 shadow-2xl shadow-black/50">
+            <div className="flex items-center justify-between gap-3 border-b border-border p-4">
+              <h2 className="text-lg font-bold tracking-tight">Membership Form</h2>
               <div className="flex items-center gap-2">
                 <a
                   href={FORM_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-purple-bright/40 hover:text-foreground"
+                  className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                   Open in new tab
@@ -68,7 +66,7 @@ export function MembershipButton() {
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Close"
-                  className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
+                  className="grid h-9 w-9 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
                 >
                   <X className="h-5 w-5" />
                 </button>

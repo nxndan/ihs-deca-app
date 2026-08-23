@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { TypedTitle } from "@/components/typed-title";
 import { Announcements, type Announcement } from "@/components/announcements";
 import { MembershipButton } from "@/components/membership-button";
 
@@ -34,37 +33,37 @@ No experience needed and no commitment required to come check it out — bring a
 
 export default function Home() {
   return (
-    <div className="space-y-12">
+    <div className="space-y-20">
       {/* ---------- Hero ---------- */}
-      <section className="glass-edge relative overflow-hidden rounded-3xl px-6 py-20 text-center sm:px-10 sm:py-28">
-        {/* crisp neon top edge line */}
-        <div
-          aria-hidden="true"
-          className="brand-hairline-anim absolute inset-x-10 top-0"
-        />
+      <section className="grid items-center gap-8 pt-4 sm:pt-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-4">
+        <div>
+          <p className="eyebrow">Independence High School · Frisco, Texas</p>
 
-        <div className="mx-auto flex max-w-2xl flex-col items-center">
-          <h1 className="font-heading text-6xl font-bold leading-[1.02] tracking-tight sm:text-8xl">
-            <TypedTitle
-              text="IHS DECA"
-              textClassName="text-gradient-brand text-glow-purple"
-            />
+          <h1 className="mt-5 max-w-3xl text-5xl leading-[1.05] tracking-tight sm:text-7xl">
+            IHS DECA
           </h1>
 
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Announcements, menu, rec forms, store signups, and competition
-            resources — everything our chapter needs, in one place.
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+            Announcements, the Knights&apos; Market menu, recommendation
+            requests, store sign-ups, and competition resources — everything our
+            chapter needs, in one place.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-9 flex flex-wrap items-center gap-3">
             <MembershipButton />
-            <Link
-              href="/resources"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-purple-bright/50 hover:bg-white/5"
-            >
+            <Link href="/resources" className="btn-secondary h-11 px-5">
               Competition Resources
             </Link>
           </div>
+        </div>
+
+        {/* IHS Knights emblem. */}
+        <div className="flex justify-center lg:justify-end">
+          <img
+            src="/hero-knight.png"
+            alt="IHS DECA Knights"
+            className="pointer-events-none w-full max-w-[260px] sm:max-w-[340px] lg:max-w-[400px]"
+          />
         </div>
       </section>
 

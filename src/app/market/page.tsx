@@ -288,28 +288,6 @@ function ShiftPanel({
 // ------------------------------------------------------------------
 export default async function MarketPage() {
   const data = await getSignups();
-  const perShift = CAPACITY + MANAGER_CAPACITY;
-
-  const openShifts = (day: string) =>
-    SHIFTS.filter((sh) => !shiftClosed(day, sh.id));
-
-  const totalSlots = DAYS.reduce(
-    (s, d) => s + openShifts(d).length * perShift,
-    0
-  );
-  const filledSlots = DAYS.reduce((sum, d) => {
-    const dd = dayData(data[d]);
-    return (
-      sum +
-      openShifts(d).reduce(
-        (a, sh) =>
-          a +
-          Math.min(dd[sh.id].volunteers.length, CAPACITY) +
-          Math.min(dd[sh.id].managers.length, MANAGER_CAPACITY),
-        0
-      )
-    );
-  }, 0);
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -330,21 +308,6 @@ export default async function MarketPage() {
               </span>{" "}
               per shift. Claim an open slot below.
             </p>
-          </div>
-        </div>
-
-        {/* Week-at-a-glance */}
-        <div className="mt-6 flex items-center gap-3 text-xs text-slate-400">
-          <span className="font-mono uppercase tracking-wider">
-            {filledSlots}/{totalSlots} positions filled this week
-          </span>
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-violet-400/80 transition-all"
-              style={{
-                width: `${totalSlots ? (filledSlots / totalSlots) * 100 : 0}%`,
-              }}
-            />
           </div>
         </div>
       </header>
