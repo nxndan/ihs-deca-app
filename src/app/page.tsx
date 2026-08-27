@@ -19,6 +19,14 @@ const announcements: Announcement[] = [
       "Pre-comp testing takes place September 14th, 5-7:30 PM in the cafeteria, mark your calendars!",
     body: "Pre-comp testing takes place September 14th, 5-7:30 PM in the cafeteria, mark your calendars!",
   },
+    {
+    id: 3,
+    title: "T-Shirt Design Contest",
+    date: "09/20/2026",
+    summary:
+      "Submit an entry for this year's chapter t-shirt design! bit.ly/4gcwG5w",
+    body: "Submit an entry for this year's chapter t-shirt design! Winner gets a prize basket from the Knights Market! bit.ly/4gcwG5w",
+  },
 ];
 
 export default function Home() {
