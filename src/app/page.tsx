@@ -3,24 +3,29 @@ import { Announcements, type Announcement } from "@/components/announcements";
 import { MembershipButton } from "@/components/membership-button";
 
 const announcements: Announcement[] = [
-  {
+    {
     id: 1,
-    title: "First Chapter Meeting",
+    title: "First Chapter Meeting SLIDES",
     date: "08/26/2026",
     summary:
-      "Our first chapter meeting will be after school on Wednsday August 26 2026 in the cafeteria.",
-    body: `Our first chapter meeting will be after school on Wednsday August 26 2026 in the cafeteria. 
-    Join us for general information on DECA, precomp, the school store, and much more! 
-    Bring your friends, everyone is welcome. We can't wait to see you there!`,
+      "Slides from our first chapter meeting! https://canva.link/po68hjvh3effem3",
+    body: `In case you didn't make it to our first chapter meeting, here are the meeting slides! Read through them fully, they have some very important info! https://canva.link/po68hjvh3effem3`,
   },
   {
     id: 2,
-    title: "The Rumble",
-    date: "08/08/2026",
+    title: "Pre-Comp Testing",
+    date: "09/14/2026",
     summary:
-      "Catch IHS DECA at the Rumble this Saturday from 8 am to 11 am! Stop by our booth for information on competition this year!",
-    body: `Catch IHS DECA at the Rumble this Saturday from 8 am to 11 am! Stop by our booth for information on competition this year,
-    some cold drinks from the Knights Market, and a fun game of cornhole for a chance to win a free IHS DECA t-shirt!`,
+      "Pre-comp testing takes place September 14th, 5-7:30 PM in the cafeteria, mark your calendars!",
+    body: "Pre-comp testing takes place September 14th, 5-7:30 PM in the cafeteria, mark your calendars!",
+  },
+    {
+    id: 3,
+    title: "T-Shirt Design Contest",
+    date: "09/20/2026",
+    summary:
+      "Submit an entry for this year's chapter t-shirt design! bit.ly/4gcwG5w",
+    body: "Submit an entry for this year's chapter t-shirt design! Winner gets a prize basket from the Knights Market! bit.ly/4gcwG5w",
   },
 ];
 
