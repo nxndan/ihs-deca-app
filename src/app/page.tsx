@@ -3,13 +3,13 @@ import { Announcements, type Announcement } from "@/components/announcements";
 import { MembershipButton } from "@/components/membership-button";
 
 const announcements: Announcement[] = [
-  {
+    {
     id: 1,
     title: "First Chapter Meeting SLIDES",
     date: "08/26/2026",
     summary:
       "Slides from our first chapter meeting! https://canva.link/po68hjvh3effem3",
-    body: `In case you didn't make it to our first chapter meeting, here are the meetingn slides! Read through them fully, they have some very important info! https://canva.link/po68hjvh3effem3',
+    body: `In case you didn't make it to our first chapter meeting, here are the meeting slides! Read through them fully, they have some very important info! https://canva.link/po68hjvh3effem3`,
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const announcements: Announcement[] = [
     date: "09/14/2026",
     summary:
       "Pre-comp testing takes place September 14th, 5-7:30 PM in the cafeteria, mark your calendars!",
-    body 'Pre-comp testing takes place September 14th, 5-7:30 PM in the cafeteria, mark your calendars!',
+    body: "Pre-comp testing takes place September 14th, 5-7:30 PM in the cafeteria, mark your calendars!",
   },
 ];
 
