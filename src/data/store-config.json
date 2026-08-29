@@ -1,5 +1,5 @@
 {
-  "reset": false,
+  "reset": true,
   "capacity": 2,
   "managerCapacity": 2,
   "managerPassword": "knightsmarket",
