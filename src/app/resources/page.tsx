@@ -40,10 +40,9 @@ export default function ResourcesPage() {
               href={`/resources/${c.slug}`}
               className="group glass-edge flex flex-col rounded-2xl p-5 transition-all hover:-translate-y-1 hover:border-purple-bright/40"
             >
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="font-heading text-lg font-semibold tracking-tight">
-                  {c.title}
-                </h3>
+              <h3 className="font-heading text-lg font-semibold tracking-tight">
+                {c.title}
+              </h3>
               <p className="mt-1.5 text-sm text-muted-foreground">{c.blurb}</p>
               <span className="mt-3 text-xs font-medium text-violet-glow">
                 Enter password to view →
