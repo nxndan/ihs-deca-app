@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { href: "/rec", label: "LOR Request" },
   { href: "/market", label: "Store Signups" },
   { href: "/resources", label: "Resources" },
+  { href: "/precomp", label: "Precomp" },
 ] as const;
 
 /** "Other" dropdown destinations. */
