@@ -27,8 +27,14 @@ const announcements: Announcement[] = [
       "Submit an entry for this year's chapter t-shirt design! bit.ly/4gcwG5w",
     body: "Submit an entry for this year's chapter t-shirt design! Winner gets a prize basket from the Knights Market! bit.ly/4gcwG5w",
   },
+    {
+    id: 4,
+    title: "Online Competition Registration",
+    date: "09/1/2026",
+    summary: "Sign up for virtual DECA events, open to ALL paid DECA members!",
+    body: "Online competition sign ups are OPEN! Only ONE group member should fill out the form and put their teammate's on the form. Do separate submission for each event and round you want to compete in. Sign up to be registered here: https://docs.google.com/forms/d/e/1FAIpQLSfY-jxf7r0Rr_b7HpjHZ47Nq4aU7hU5OqNqrAK0s_NMkfeviA/viewform?usp=dialog",
+  },
 ];
-
 export default function Home() {
   return (
     <div className="space-y-20">
