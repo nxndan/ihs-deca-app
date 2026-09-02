@@ -9,15 +9,6 @@ export const metadata: Metadata = {
     "Competition resources for Independence DECA — roleplays, principles, prepared events, and online events.",
 };
 
-function LockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5" aria-hidden="true">
-      <rect x="4.5" y="10.5" width="15" height="10" rx="2" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M8 10.5V7a4 4 0 1 1 8 0v3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 export default function ResourcesPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -53,11 +44,6 @@ export default function ResourcesPage() {
                 <h3 className="font-heading text-lg font-semibold tracking-tight">
                   {c.title}
                 </h3>
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/12 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  <LockIcon />
-                  Locked
-                </span>
-              </div>
               <p className="mt-1.5 text-sm text-muted-foreground">{c.blurb}</p>
               <span className="mt-3 text-xs font-medium text-violet-glow">
                 Enter password to view →
