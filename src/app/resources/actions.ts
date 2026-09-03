@@ -28,6 +28,6 @@ export async function unlockCluster(
     maxAge: 60 * 60 * 8, // 8 hours
   });
 
-  revalidatePath(`/resources/${slug}`);
+  revalidatePath(slug === "precomp" ? "/precomp" : `/resources/${slug}`);
   return { error: null };
 }

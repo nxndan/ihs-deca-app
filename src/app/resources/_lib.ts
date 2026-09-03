@@ -7,6 +7,7 @@ const PASSWORDS: Record<string, string> = {
   "principles-roleplays": "indyprinc",
   "prepared-events": "indywritten",
   "online-events": "indyvirtual",
+  precomp: "indyprecomp",
 };
 
 export function cookieName(slug: string) {
