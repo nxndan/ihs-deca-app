@@ -6,10 +6,13 @@ import {
   shiftClosed,
   dayData,
   getSignups,
+  getClosed,
   type ShiftData,
 } from "./lib";
 import { handleVolunteerSignup } from "./actions";
 import { ManagerSignup } from "@/components/market/manager-signup";
+import { SignupRow } from "@/components/market/signup-row";
+import { ResetWeekButton } from "@/components/market/reset-week";
 
 // Always fetch the latest signup state on every request.
 export const dynamic = "force-dynamic";
@@ -35,13 +38,6 @@ function LockIcon({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
       <rect x="4.5" y="10.5" width="15" height="10" rx="2" stroke="currentColor" strokeWidth="1.6" />
       <path d="M8 10.5V7a4 4 0 1 1 8 0v3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -160,17 +156,16 @@ function ShiftPanel({
           const s = data.volunteers[i];
           if (s && !isClosed) {
             return (
-              <li
+              <SignupRow
                 key={i}
-                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2"
-              >
-                <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full border border-purple-400/40 bg-purple-400/10 text-purple-200">
-                  <CheckIcon className="h-3 w-3" />
-                </span>
-                <span className="truncate text-sm font-medium text-slate-100">
-                  {s.name}
-                </span>
-              </li>
+                day={day}
+                shift={shift.id}
+                shiftLabel={shift.label}
+                role="volunteer"
+                variant="volunteer"
+                index={i}
+                name={s.name}
+              />
             );
           }
           return (
@@ -250,15 +245,16 @@ function ShiftPanel({
             const m = data.managers[i];
             if (m && !isClosed) {
               return (
-                <li
+                <SignupRow
                   key={i}
-                  className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.02] px-2.5 py-1"
-                >
-                  <span className="grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full border border-purple-400/30 text-purple-300">
-                    <CheckIcon className="h-2 w-2" />
-                  </span>
-                  <span className="truncate text-xs text-slate-400">{m.name}</span>
-                </li>
+                  day={day}
+                  shift={shift.id}
+                  shiftLabel={shift.label}
+                  role="manager"
+                  variant="manager"
+                  index={i}
+                  name={m.name}
+                />
               );
             }
             return (
@@ -288,13 +284,14 @@ function ShiftPanel({
 // ------------------------------------------------------------------
 export default async function MarketPage() {
   const data = await getSignups();
+  const closed = await getClosed();
 
   return (
     <div className="mx-auto max-w-6xl">
       {/* Header */}
-      <header className="mb-10">
+      <header className="mb-10 flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/5 text-purple-300 backdrop-blur">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/5 text-purple-300 backdrop-blur">
             <StoreIcon className="h-6 w-6" />
           </span>
           <div>
@@ -310,13 +307,16 @@ export default async function MarketPage() {
             </p>
           </div>
         </div>
+        <ResetWeekButton days={[...DAYS]} shifts={SHIFTS} closed={closed} />
       </header>
 
       {/* Day cards — one per row, three shifts across on wide screens */}
       <div className="grid grid-cols-1 gap-6">
         {DAYS.map((day) => {
           const dd = dayData(data[day]);
-          const dayFullyClosed = SHIFTS.every((sh) => shiftClosed(day, sh.id));
+          const dayFullyClosed = SHIFTS.every((sh) =>
+            shiftClosed(closed, day, sh.id)
+          );
 
           return (
             <div key={day} className="group relative">
@@ -357,7 +357,7 @@ export default async function MarketPage() {
                       day={day}
                       shift={sh}
                       data={dd[sh.id]}
-                      isClosed={shiftClosed(day, sh.id)}
+                      isClosed={shiftClosed(closed, day, sh.id)}
                     />
                   ))}
                 </div>
