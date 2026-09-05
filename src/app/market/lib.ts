@@ -69,15 +69,12 @@ export function dayData(raw: unknown): DayData {
 }
 
 // ------------------------------------------------------------------
-// KV read — tolerant of a not-yet-provisioned store; honours `reset`.
+// KV read — tolerant of a not-yet-provisioned store.
+// Clearing the week is handled by the "Reset week" action (kv.del), NOT by a
+// static config flag, so signups always persist during normal operation.
 // ------------------------------------------------------------------
 export async function getSignups(): Promise<Record<string, unknown>> {
   try {
-    if ((config as { reset?: boolean }).reset) {
-      // Clearing the whole key wipes volunteers AND managers.
-      await kv.del(KV_KEY);
-      return {};
-    }
     return (await kv.get<Record<string, unknown>>(KV_KEY)) ?? {};
   } catch {
     return {};
