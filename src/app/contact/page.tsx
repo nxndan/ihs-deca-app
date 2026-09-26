@@ -99,7 +99,7 @@ const GROUPS: Group[] = [
 
 function EmailLink({ email }: { email: string }) {
   return (
-    
+    <a
       href={`mailto:${email}`}
       className="break-all text-sm font-medium text-foreground underline decoration-border-strong underline-offset-4 transition-colors hover:text-royal hover:decoration-royal"
     >
