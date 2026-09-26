@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { href: "/market", label: "Store Signups" },
   { href: "/resources", label: "Resources" },
   { href: "/precomp", label: "Precomp" },
+  { href: "/contact", label: "Contact" },
 ] as const;
 
 /** "Other" dropdown destinations. */
