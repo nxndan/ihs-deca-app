@@ -7,7 +7,7 @@ import {
   CLOSED_KV_KEY,
   DAYS,
   SHIFTS,
-  CAPACITY,
+  capacityFor,
   MANAGER_CAPACITY,
   MANAGER_PASSWORD,
   RESET_PASSWORD,
@@ -47,7 +47,7 @@ export async function handleVolunteerSignup(formData: FormData) {
   const dd = dayData(data[day]);
   const sd = dd[shift];
 
-  if (sd.volunteers.length >= CAPACITY) return; // re-verify capacity
+  if (sd.volunteers.length >= capacityFor(shift)) return; // re-verify capacity
   sd.volunteers.push({ name, email });
   data[day] = dd;
 
