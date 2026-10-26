@@ -18,6 +18,14 @@ export const CLOSED_KV_KEY = "store_closed";
 export const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] as const;
 
 export const CAPACITY: number = (config as { capacity?: number }).capacity ?? 2;
+// Per-shift volunteer capacity overrides (shifts not listed use CAPACITY).
+const SHIFT_CAPACITY_OVERRIDES: Record<string, number> = {
+  morning: 4,
+};
+export function capacityFor(shiftId: string): number {
+  return SHIFT_CAPACITY_OVERRIDES[shiftId] ?? CAPACITY;
+}
+
 export const MANAGER_CAPACITY: number =
   (config as { managerCapacity?: number }).managerCapacity ?? 2;
 
