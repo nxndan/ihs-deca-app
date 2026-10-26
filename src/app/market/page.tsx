@@ -2,6 +2,7 @@ import {
   DAYS,
   SHIFTS,
   CAPACITY,
+  capacityFor,
   MANAGER_CAPACITY,
   shiftClosed,
   dayData,
@@ -111,8 +112,9 @@ function ShiftPanel({
   isClosed: boolean;
 }) {
   const Icon = shiftIcon(shift.id);
-  const volFilled = Math.min(data.volunteers.length, CAPACITY);
-  const volFull = volFilled >= CAPACITY;
+  const cap = capacityFor(shift.id);
+  const volFilled = Math.min(data.volunteers.length, cap);
+  const volFull = volFilled >= cap;
   const mgrFilled = Math.min(data.managers.length, MANAGER_CAPACITY);
   const mgrFull = mgrFilled >= MANAGER_CAPACITY;
 
@@ -141,18 +143,18 @@ function ShiftPanel({
           </span>
         ) : volFull ? (
           <span className="shrink-0 rounded-full border border-purple-400/40 bg-purple-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-purple-200">
-            Full {CAPACITY}/{CAPACITY}
+            Full {cap}/{cap}
           </span>
         ) : (
           <span className="shrink-0 rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-            {volFilled}/{CAPACITY}
+            {volFilled}/{cap}
           </span>
         )}
       </div>
 
       {/* Volunteer slots */}
       <ul className="mt-3 space-y-2">
-        {Array.from({ length: CAPACITY }).map((_, i) => {
+        {Array.from({ length: cap }).map((_, i) => {
           const s = data.volunteers[i];
           if (s && !isClosed) {
             return (
@@ -301,7 +303,8 @@ export default async function MarketPage() {
             <p className="mt-1 text-sm text-slate-400">
               Sign up to volunteer at The Knights Market —{" "}
               <span className="text-slate-300">
-                {CAPACITY} volunteers + {MANAGER_CAPACITY} officers
+                {CAPACITY} volunteers ({capacityFor("morning")} in the morning) +{" "}
+                {MANAGER_CAPACITY} officers
               </span>{" "}
               per shift. Claim an open slot below.
             </p>
